@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Научный навигатор - Газпром нефть</title>
+    <style>
+        :root {
+            --primary-color: #0e4094;
+            --secondary-color: #1a5bb5;
+            --accent-color: #0071bc;
+            --text-color: #333333;
+            --light-text: #ffffff;
+            --light-bg: #f5f5f5;
+            --border-radius: 20px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: transparent;
+            color: var(--light-text);
+            padding: 15px 0;
+			position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        header.scrolled {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            background-image: url('images/background.jpg');
+            background-size: cover;
+            background-position: 100% 92.5%;
+            background-blend-mode: multiply;
+            margin-top: 10;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .img-custom {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-menu a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-menu a:hover {
+            opacity: 0.8;
+        }
+        
+        .hero {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 120px 0 60px;
+            background-image: url('images/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: multiply;
+            position: relative;
+            margin-top: 0;
+        }
+        
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            z-index: 1;
+            position: relative;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            text-align: center;
+            min-width: 150px;
+        }
+        
+        .btn-primary {
+            background-color: var(--light-text);
+            color: var(--primary-color);
+            border: 2px solid var(--light-text);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            border: 2px solid var(--secondary-color);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section {
+            padding: 60px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+            font-size: 2.2rem;
+        }
+        
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-image {
+            display: none; /* Убираем изображения */
+        }
+        
+        .card-image .img-custom {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.5s;
+        }
+        
+        .card:hover .card-image .img-custom {
+            transform: scale(1.05);
+        }
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .card-text {
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .infographic {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .infographic .img-custom {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        footer {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 40px 0;
+            margin-top: 60px;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        
+        .footer-column {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--accent-color);
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column a {
+            color: var(--light-text);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        
+        .footer-column a:hover {
+            opacity: 0.8;
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-block {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-block h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-block h3 img {
+            margin-right: 15px;
+            width: 30px;
+            height: 30px;
+        }
+        
+        .info-block p {
+            margin-bottom: 20px;
+        }
+        
+        .benefit-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        
+        .benefit-list li {
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .statistics-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="main-header">
+        <div class="container header-content">
+            <img src="images/logo.png" alt="Газпром нефть" class="img-custom" width="100" height="100">
+        </div>
+    </header>
+    
+    <section class="hero" id="hero-section">
+        <div class="container hero-content">
+            <h1>НАУЧНЫЙ НАВИГАТОР</h1>
+            <!--<h2>ПРЕИМУЩЕСТВА УЧАСТИЯ В НТК</h2>-->
+            <div class="buttons">
+                <a href="soder.html" class="btn btn-primary">ВЕРНУТЬСЯ К СОДЕРЖАНИЮ</a>
+                <a href="main.html" class="btn btn-primary">ВЕРНУТЬСЯ НА ГЛАВНУЮ СТРАНИЦУ</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="content" class="section">
+        <div class="container">
+            <h2 class="section-title">Преимущества участия в НТК</h2>
+            
+            <div class="info-block">
+                <h3>Значение участия для молодых специалистов</h3>
+                <p>Участие в Научно-Технических конференциях (НТК) предоставляет молодым специалистам уникальные возможности для профессионального роста и самореализации. Ниже представлены ключевые преимущества:</p>
+                
+                <ul class="benefit-list">
+                    <li><strong>Развитие компетенций:</strong> подготовка и защита научных проектов позволяет совершенствовать аналитические и презентационные навыки.</li>
+                    <li><strong>Нетворкинг:</strong> участие в НТК способствует установлению контактов с экспертами, коллегами из других подразделений и потенциальными менторами.</li>
+                    <li><strong>Признание:</strong> успешное выступление на конференции может стать важным этапом карьерного развития, повысить видимость сотрудника в компании.</li>
+                    <li><strong>Практическая реализация идей:</strong> лучшие проекты могут быть внедрены в производственные процессы или стать основой для стратегических инициатив.</li>
+                </ul>
+                
+                <h4>Статистика:</h4>
+                <table class="statistics-table">
+                    <tr>
+                        <th>Год</th>
+                        <th>Количество участников</th>
+                        <th>Проектов, реализованных по итогам НТК</th>
+                    </tr>
+                    <tr>
+                        <td>2022</td>
+                        <td>150</td>
+                        <td>38</td>
+                    </tr>
+                    <tr>
+                        <td>2023</td>
+                        <td>190</td>
+                        <td>52</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="info-block">
+                <h3>Значение участия для кураторов</h3>
+                <p>Кураторы играют ключевую роль в успехе Научно-Технической конференции (НТК). Их участие позволяет обеспечить:</p>
+                
+                <ul class="benefit-list">
+                    <li><strong>Методическую поддержку:</strong> Кураторы помогают участникам структурировать идеи, оформлять документы и подготавливать доклады.</li>
+                    <li><strong>Повышение качества проектов:</strong> Благодаря экспертной оценке кураторов повышается уровень технической проработки и значимости представляемых тем.</li>
+                    <li><strong>Передачу знаний:</strong> Кураторы, обладая опытом и знаниями, становятся наставниками, способствующими профессиональному росту молодых специалистов.</li>
+                </ul>
+                
+                <p>Таким образом, участие кураторов в НТК способствует развитию культуры наставничества, укреплению корпоративной экспертизы и выстраиванию прочных профессиональных связей.</p>
+            </div>
+            
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-image">
+                        <img src="images/exchange.jpg" alt="Обмен опытом" class="img-custom" width="300" height="200">
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Обмен опытом</h3>
+                        <p class="card-text">Участники получают возможность представить свои разработки, обменяться идеями и обсудить инновационные подходы с коллегами из различных подразделений.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-image">
+                        <img src="images/career.jpg" alt="Карьерный рост" class="img-custom" width="300" height="200">
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Признание и карьерный рост</h3>
+                        <p class="card-text">Лучшие проекты получают признание на уровне компании, что может стать толчком для профессионального роста.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-image">
+                        <img src="images/expert.jpg" alt="Экспертная поддержка" class="img-custom" width="300" height="200">
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Экспертная поддержка</h3>
+                        <p class="card-text">В рамках НТК участники взаимодействуют с опытными кураторами и экспертами, что позволяет повысить качество проработки тем.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="section-title">Влияние участия в НТК на карьерный рост</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Этап</th>
+                        <th>Преимущество</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Подача заявки</td>
+                        <td>Формирование идеи и вовлечённость</td>
+                    </tr>
+                    <tr>
+                        <td>Проработка темы</td>
+                        <td>Глубокое понимание процессов, консультации с экспертами</td>
+                    </tr>
+                    <tr>
+                        <td>Выступление</td>
+                        <td>Навыки публичных выступлений, командная работа</td>
+                    </tr>
+                    <tr>
+                        <td>Отбор</td>
+                        <td>Признание, рекомендации, карьерные возможности</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    
+    <script>
+        // Изменение цвета шапки при прокрутке
+        window.addEventListener('scroll', function () {
+            const header = document.getElementById('main-header');
+            const scrollPosition = window.scrollY;
+            if (scrollPosition > 270) {
+                if (header) header.classList.add('scrolled');
+            } else {
+                if (header) header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>
