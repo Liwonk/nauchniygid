@@ -262,7 +262,7 @@
             font-weight: 600;
         }
 
-        /* Модальное окно для увеличенного изображения */
+        /* Модальное окно для картинки */
         .image-modal {
             display: none;
             position: fixed;
@@ -386,13 +386,7 @@
         <div class="container">
             <h2 class="section-title">Преимущества участия в НТК</h2>
             
-            <!-- Существующий контент вашей страницы 
-            <div class="existing-content">
-                <p>Здесь размещается ваш существующий контент страницы tema1-kopiia-2.html</p>
-            </div>
-			-->
-            
-            <!-- Секция с превью скриншотов -->
+
             <div class="preview-section">
                 <p class="preview-text">Скоро здесь появится расширенное содержание:</p>
                 
@@ -408,7 +402,6 @@
         </div>
     </section>
 
-    <!-- Модальное окно для увеличенных изображений -->
     <div id="imageModal" class="image-modal">
         <div class="image-modal-content">
             <span class="image-close" onclick="closeImageModal()">&times;</span>
@@ -419,7 +412,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             
-            // Функции для управления модальным окном изображений
             window.openImageModal = function(imageSrc) {
                 const modal = document.getElementById('imageModal');
                 const modalImg = document.getElementById('modalImage');
@@ -435,7 +427,6 @@
                 document.body.style.overflow = 'auto';
             };
 
-            // Закрытие модального окна изображения при клике на фон
             const imageModal = document.getElementById('imageModal');
             imageModal.addEventListener('click', function(e) {
                 if (e.target === imageModal) {
@@ -443,7 +434,6 @@
                 }
             });
             
-            // Закрытие модального окна изображения на ESC
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && imageModal.style.display === 'block') {
                     closeImageModal();
@@ -451,7 +441,6 @@
             });
         });
 
-        // Изменение цвета шапки при прокрутке
         window.addEventListener('scroll', function () {
             const header = document.getElementById('main-header');
             const scrollPosition = window.scrollY;

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Научный навигатор - Газпром нефть</title>
+    <style>
+        :root {
+            --primary-color: #0e4094;
+            --secondary-color: #1a5bb5;
+            --accent-color: #0071bc;
+            --text-color: #333333;
+            --light-text: #ffffff;
+            --light-bg: #f5f5f5;
+            --border-radius: 20px;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: transparent;
+            color: var(--light-text);
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        header.scrolled {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            background-image: url('images/background.jpg');
+            background-size: cover;
+            background-position: 100% 92.5%;
+            background-blend-mode: multiply;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .img-custom {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+        }
+        .nav-menu a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        .nav-menu a:hover {
+            opacity: 0.8;
+        }
+        .hero {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 120px 0 60px;
+            background-image: url('images/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: multiply;
+            position: relative;
+            margin-top: 0;
+        }
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            z-index: 1;
+            position: relative;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 30px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            text-align: center;
+            min-width: 150px;
+        }
+        .btn-primary {
+            background-color: var(--light-text);
+            color: var(--primary-color);
+            border: 2px solid var(--light-text);
+        }
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            border: 2px solid var(--secondary-color);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .section {
+            padding: 60px 0;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+            font-size: 2.2rem;
+        }
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        .card-image .img-custom {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.5s;
+        }
+        .card:hover .card-image .img-custom {
+            transform: scale(1.05);
+        }
+        .card-content {
+            padding: 20px;
+        }
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        .card-text {
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .infographic {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .infographic .img-custom {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        footer {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 40px 0;
+            margin-top: 60px;
+        }
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        .footer-column {
+            flex: 1;
+            min-width: 200px;
+        }
+        .footer-column h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--accent-color);
+        }
+        .footer-column ul {
+            list-style: none;
+        }
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        .footer-column a {
+            color: var(--light-text);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        .footer-column a:hover {
+            opacity: 0.8;
+        }
+        .copyright {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .info-block {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        .info-block h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+        }
+        .info-block h3 img {
+            margin-right: 15px;
+            width: 30px;
+            height: 30px;
+        }
+        .info-block p {
+            margin-bottom: 20px;
+        }
+        .benefit-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        .benefit-list li {
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+        }
+        .statistics-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+        /* Карточки экспертов */
+        .experts-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .expert-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            width: 300px;
+            opacity: 0;
+            animation: none;
+        }
+        .expert-card:hover {
+            transform: translateY(-5px);
+        }
+        .expert-photo {
+            width: 100%;
+            height: 250px;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .expert-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .expert-photo span {
+            color: #666;
+            font-size: 14px;
+        }
+        .expert-info {
+            padding: 15px;
+        }
+        .expert-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .expert-position {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .expert-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-weight: bold;
+            font-size: 18px;
+            color: #444;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #777;
+        }
+        .rating {
+            color: #ffc107;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        /* Анимация появления карточек экспертов */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .expert-card.visible {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        /* Задержки для каждой карточки */
+        .experts-container .expert-card.visible:nth-child(1) { animation-delay: 0.3s; }
+        .experts-container .expert-card.visible:nth-child(2) { animation-delay: 0.4s; }
+        .experts-container .expert-card.visible:nth-child(3) { animation-delay: 0.5s; }
+        .experts-container .expert-card.visible:nth-child(4) { animation-delay: 0.6s; }
+        .experts-container .expert-card.visible:nth-child(5) { animation-delay: 0.7s; }
+        .experts-container .expert-card.visible:nth-child(6) { animation-delay: 0.8s; }
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+            .footer-content {
+                flex-direction: column;
+            }
+            .experts-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .expert-card {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header id="main-header">
+        <div class="container header-content">
+            <img src="images/logo.png" alt="Газпром нефть" class="img-custom" width="100" height="100">
+        </div>
+    </header>
+    <section class="hero" id="hero-section">
+        <div class="container hero-content">
+            <h1>НАУЧНЫЙ НАВИГАТОР</h1>
+            <div class="buttons">
+                <a href="soder.html" class="btn btn-primary">ВЕРНУТЬСЯ К СОДЕРЖАНИЮ</a>
+                <a href="index.html" class="btn btn-primary">ВЕРНУТЬСЯ НА ГЛАВНУЮ СТРАНИЦУ</a>
+            </div>
+        </div>
+    </section>
+    <section id="content" class="section">
+        <div class="container">
+            <h2 class="section-title">Список кураторов НТК </h2>
+            <div class="experts-container">
+                <!-- Эксперт 1 -->
+                <div class="expert-card">
+                    <div class="expert-photo">
+                        <img src="images/m1.jpg" alt="Иванов Александр">
+                    </div>
+                    <div class="expert-info">
+                        <div class="expert-name">Иванов Александр</div>
+                        <div class="expert-position">Ведущий инженер-разработчик</div>
+                        <div class="rating">★★★★★</div>
+                        <div class="expert-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">12</div>
+                                <div class="stat-label">Проектов</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">8</div>
+                                <div class="stat-label">Лет стажа</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Эксперт 2 -->
+                <div class="expert-card">
+                    <div class="expert-photo">
+                        <img src="images/j1.jpg" alt="Петрова Екатерина">
+                    </div>
+                    <div class="expert-info">
+                        <div class="expert-name">Петрова Екатерина</div>
+                        <div class="expert-position">Руководитель проектов</div>
+                        <div class="rating">★★★★☆</div>
+                        <div class="expert-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">9</div>
+                                <div class="stat-label">Проектов</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">5</div>
+                                <div class="stat-label">Лет стажа</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Эксперт 3 -->
+                <div class="expert-card">
+                    <div class="expert-photo">
+                        <img src="images/m2.jpg" alt="Смирнов Дмитрий">
+                    </div>
+                    <div class="expert-info">
+                        <div class="expert-name">Смирнов Дмитрий</div>
+                        <div class="expert-position">Технический директор</div>
+                        <div class="rating">★★★★★</div>
+                        <div class="expert-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">21</div>
+                                <div class="stat-label">Проектов</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">12</div>
+                                <div class="stat-label">Лет стажа</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Эксперт 4 -->
+                <div class="expert-card">
+                    <div class="expert-photo">
+                        <img src="images/j2.jpg" alt="Козлова Анна">
+                    </div>
+                    <div class="expert-info">
+                        <div class="expert-name">Козлова Анна</div>
+                        <div class="expert-position">Аналитик данных</div>
+                        <div class="rating">★★★☆☆</div>
+                        <div class="expert-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">7</div>
+                                <div class="stat-label">Проектов</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">3</div>
+                                <div class="stat-label">Лет стажа</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Эксперт 5 -->
+                <div class="expert-card">
+                    <div class="expert-photo">
+                        <img src="images/m3.jpg" alt="Новиков Игорь">
+                    </div>
+                    <div class="expert-info">
+                        <div class="expert-name">Новиков Игорь</div>
+                        <div class="expert-position">Системный архитектор</div>
+                        <div class="rating">★★★★☆</div>
+                        <div class="expert-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">15</div>
+                                <div class="stat-label">Проектов</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">9</div>
+                                <div class="stat-label">Лет стажа</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Эксперт 6 -->
+                <div class="expert-card">
+                    <div class="expert-photo">
+                        <img src="images/j3.jpg" alt="Соколова Мария">
+                    </div>
+                    <div class="expert-info">
+                        <div class="expert-name">Соколова Мария</div>
+                        <div class="expert-position">Старший разработчик</div>
+                        <div class="rating">★★★★★</div>
+                        <div class="expert-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">11</div>
+                                <div class="stat-label">Проектов</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">7</div>
+                                <div class="stat-label">Лет стажа</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        window.addEventListener('scroll', function () {
+            const header = document.getElementById('main-header');
+            const scrollPosition = window.scrollY;
+            if (scrollPosition > 270) {
+                if (header) header.classList.add('scrolled');
+            } else {
+                if (header) header.classList.remove('scrolled');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const cards = document.querySelectorAll('.experts-container .expert-card');
+            cards.forEach((card, idx) => {
+                setTimeout(() => {
+                    card.classList.add('visible');
+                }, 300 + idx * 100);
+            });
+        });
+    </script>
+</body>
+</html>

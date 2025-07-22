@@ -655,7 +655,7 @@
         </div>
     </section>
 
-    <!-- Модальное окно -->
+
     <div id="cardModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -676,7 +676,7 @@
             const closeBtn = document.querySelector('.modal-close');
             const cardLinks = document.querySelectorAll('.card-link');
             
-            // Функция для обработки текста и создания списков
+
             function parseTextWithLists(text) {
                 const lines = text.split('\n');
                 let result = '';
@@ -1061,7 +1061,7 @@ li Внедрение новых цифровых подходов к управ
                 }
             };
             
-            // Открытие модального окна при клике на карточку
+
             cardLinks.forEach(link => {
                 link.addEventListener('click', function() {
                     const modalKey = this.getAttribute('data-modal');
@@ -1070,12 +1070,12 @@ li Внедрение новых цифровых подходов к управ
                     if (data) {
                         modalTitle.textContent = data.title;
                         
-                        // Создаем HTML для карточек
+
                         let cardsHTML = `<p>${data.description}</p>`;
                         cardsHTML += '<div class="modal-cards-container">';
                         
                         data.cards.forEach(card => {
-                            // Обрабатываем текст с поддержкой списков
+
                             const processedText = parseTextWithLists(card.text);
                             
                             cardsHTML += `
@@ -1096,13 +1096,13 @@ li Внедрение новых цифровых подходов к управ
                 });
             });
             
-            // Закрытие модального окна на крестик
+
             closeBtn.addEventListener('click', function() {
                 modal.style.display = 'none';
                 document.body.style.overflow = 'auto';
             });
             
-            // Закрытие модального окна при клике на фон
+
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) {
                     modal.style.display = 'none';
@@ -1110,7 +1110,7 @@ li Внедрение новых цифровых подходов к управ
                 }
             });
             
-            // Закрытие модального окна на ESC
+
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && modal.style.display === 'block') {
                     modal.style.display = 'none';
@@ -1119,7 +1119,7 @@ li Внедрение новых цифровых подходов к управ
             });
         });
 
-        // Изменение цвета шапки при прокрутке
+
         window.addEventListener('scroll', function () {
             const header = document.getElementById('main-header');
             const scrollPosition = window.scrollY;

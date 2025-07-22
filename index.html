@@ -227,7 +227,6 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
-        /* Декоративные элементы */
         .decoration {
             position: absolute;
             border-radius: 50%;
@@ -508,13 +507,12 @@
     
     <section class="hero" id="hero-section">
         <div class="container hero-content">
-            <!-- Декоративные элементы -->
+
             <div class="decoration decoration-1"></div>
             <div class="decoration decoration-2"></div>
             <div class="decoration decoration-3"></div>
             <div class="decoration decoration-4"></div>
             
-            <!-- Анимированные частицы -->
             <div class="particles" id="particles"></div>
             
             <h1>НАУЧНЫЙ НАВИГАТОР</h1>
@@ -526,7 +524,7 @@
     </section>
 
     <script>
-        // Изменение цвета шапки при прокрутке
+
         window.addEventListener('scroll', function () {
             const header = document.getElementById('main-header');
             const scrollPosition = window.scrollY;
@@ -537,7 +535,6 @@
             }
         });
         
-        // Создание анимированных частиц
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             const particleCount = 20;
@@ -545,41 +542,34 @@
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('span');
                 particle.classList.add('particle');
-                
-                // Случайное начальное положение
+
                 const x = Math.random() * 100;
                 const y = Math.random() * 100;
                 particle.style.left = x + '%';
                 particle.style.top = y + '%';
-                
-                // Случайное направление движения
+
                 const xMove = (Math.random() - 0.5) * 200;
                 const yMove = (Math.random() - 0.5) * 200;
                 particle.style.setProperty('--x', xMove + 'px');
                 particle.style.setProperty('--y', yMove + 'px');
                 
-                // Случайный размер
                 const size = Math.random() * 5 + 3;
                 particle.style.width = size + 'px';
                 particle.style.height = size + 'px';
                 
-                // Случайная задержка анимации
                 const delay = Math.random() * 2;
                 particle.style.animationDelay = delay + 's';
                 
-                // Случайная продолжительность анимации
                 const duration = Math.random() * 3 + 2;
                 particle.style.animationDuration = duration + 's';
                 
-                // Случайная прозрачность
                 const opacity = Math.random() * 0.5 + 0.1;
                 particle.style.opacity = opacity;
                 
                 particlesContainer.appendChild(particle);
             }
         }
-        
-        // Запуск создания частиц после загрузки страницы
+
         window.addEventListener('load', createParticles);
     </script>
 </body>
