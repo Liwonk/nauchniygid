@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Научный навигатор - Газпром нефть</title>
+    <title>Дорожная карта НТК - Научный навигатор</title>
     <style>
         :root {
             --primary-color: #0e4094;
@@ -14,27 +14,52 @@
             --light-bg: #f5f5f5;
             --border-radius: 20px;
             --card-padding: 25px;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --error-color: #dc3545;
+            --orange-color: #ff6b35;
+            --orange-light: #ff8c5a;
         }
-
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Arial', sans-serif;
         }
-
+        
         body {
             background-color: var(--light-bg);
             color: var(--text-color);
             line-height: 1.6;
         }
 
+        /* Админ-панель стили */
+        #admin-overlay {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+        #admin-notification {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        #admin-notification:has-text("Загрузка") {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        body:has(#admin-overlay) {
+            overflow: hidden;
+        }
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
-
+        
+        /* Header */
         header {
             background-color: transparent;
             color: var(--light-text);
@@ -44,6 +69,7 @@
             top: 0;
             left: 0;
             z-index: 1000;
+            transition: all 0.3s ease;
         }
         
         header.scrolled {
@@ -53,7 +79,6 @@
             background-size: cover;
             background-position: 100% 92.5%;
             background-blend-mode: multiply;
-            margin-top: 10;
         }
         
         .header-content {
@@ -61,14 +86,34 @@
             justify-content: space-between;
             align-items: center;
         }
-
+        
         .img-custom {
             display: block;
             max-width: 100%;
             height: auto;
             object-fit: cover;
         }
-
+        
+        .logo-link {
+            display: inline-block;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            padding: 5px;
+        }
+        .logo-link:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+        .logo-link:active {
+            transform: scale(0.98);
+        }
+        .logo-link:focus {
+            outline: 2px solid rgba(255, 255, 255, 0.5);
+            outline-offset: 3px;
+        }
+        
+        /* Hero */
         .hero {
             background-color: var(--primary-color);
             color: var(--light-text);
@@ -80,7 +125,7 @@
             position: relative;
             margin-top: 0;
         }
-
+        
         .hero-content {
             text-align: center;
             max-width: 800px;
@@ -88,29 +133,21 @@
             z-index: 1;
             position: relative;
         }
-
+        
         .hero h1 {
             font-size: 3.5rem;
             margin-bottom: 20px;
             font-weight: 700;
             letter-spacing: 1px;
         }
-
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
+        
         .buttons {
             display: flex;
             justify-content: center;
             gap: 20px;
             margin-top: 30px;
         }
-
+        
         .btn {
             padding: 12px 30px;
             border-radius: var(--border-radius);
@@ -121,242 +158,690 @@
             text-align: center;
             min-width: 150px;
         }
-
+        
         .btn-primary {
             background-color: var(--light-text);
             color: var(--primary-color);
             border: 2px solid var(--light-text);
         }
-
-        .btn-secondary {
-            background-color: var(--secondary-color);
-            color: var(--light-text);
-            border: 2px solid var(--secondary-color);
-        }
-
+        
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-
+        
         .section {
             padding: 60px 0;
         }
-
+        
         .section-title {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 60px;
             color: var(--primary-color);
-            font-size: 2.2rem;
+            font-size: 2.8rem;
+            font-weight: 800;
         }
 
-        .card-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            align-items: stretch;
-        }
-        
-        .card-container .card-link:last-child:nth-child(3n + 1) {
-            grid-column: 2;
-        }
-
-        .card-link {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-            height: 100%;
-        }
-
-        .card {
-            position: relative;
-            background-color: var(--primary-color);
-            color: var(--light-text);
+        /* ===== ДОРОЖНАЯ КАРТА НТК 2025 (ТАБЛИЦА) ===== */
+        .timeline-table-container {
+            overflow-x: auto;
+            margin-bottom: 60px;
             border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: 0 8px 20px rgba(14, 64, 148, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            padding: var(--card-padding);
-            height: 100%;
-            cursor: pointer;
-        }
-
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(14, 64, 148, 0.5);
-        }
-
-        .card-content {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-
-        .card-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: var(--light-text);
-            text-align: center;
-            word-break: break-word;
-            margin: 0;
-            line-height: 1.3;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-        }
-
-        .screenshot-gallery {
-            display: column;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .screenshot-item {
-            position: relative;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: 0 8px 20px rgba(14, 64, 148, 0.2);
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .screenshot-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(14, 64, 148, 0.3);
-        }
-
-        .screenshot-image {
+            box-shadow: 0 10px 30px rgba(14, 64, 148, 0.15);
             width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
-            border-radius: var(--border-radius);
+            -webkit-overflow-scrolling: touch;
         }
 
-        .screenshot-caption {
+        .timeline-table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .timeline-table th {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px 8px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
+        .timeline-table th:last-child {
+            border-right: none;
+        }
+        .timeline-table th:first-child {
+            min-width: 220px;
+            text-align: left;
+            padding-left: 15px;
+        }
+
+        .timeline-table th:nth-child(2) {
+            min-width: 140px;
+        }
+
+        /* Месяцы - фиксированная ширина */
+        .timeline-table th:nth-child(n+3) {
+            width: 45px;
+            min-width: 45px;
+            max-width: 45px;
+            padding: 15px 2px;
+        }
+
+        .timeline-table td:nth-child(n+3) {
+            width: 45px;
+            min-width: 45px;
+            max-width: 45px;
+            padding: 12px 2px;
+        }
+
+		.timeline-table td {
+			padding: 12px 6px;
+			text-align: center;
+			vertical-align: middle;
+			border-bottom: 1px solid #e2e8f0;
+			border-right: 1px solid #e2e8f0;
+			background: white;
+			font-size: 0.8rem;
+			line-height: 1.3;
+			height: 60px; /* Фиксированная высота ячеек */
+			box-sizing: border-box;
+		}
+
+
+        .timeline-table td:last-child {
+            border-right: none;
+        }
+
+		.stage-cell {
+			text-align: left !important;
+			font-weight: 600;
+			color: var(--primary-color);
+			background: #f8fafc !important;
+			border-right: 2px solid var(--primary-color) !important;
+			min-width: 220px;
+			font-size: 0.82rem !important;
+			line-height: 1.2 !important;
+			padding: 12px 10px !important;
+			height: 60px !important;
+			vertical-align: middle !important;
+			box-sizing: border-box !important;
+		}
+
+
+		.responsible-cell {
+			background: #f0f9ff !important;
+			color: var(--primary-color);
+			font-weight: 600;
+			min-width: 140px;
+			font-size: 0.8rem !important;
+			line-height: 1.2 !important;
+			padding: 12px 8px !important;
+			height: 60px !important;
+			vertical-align: middle !important;
+			box-sizing: border-box !important;
+		}
+
+
+        .star-cell {
+            color: var(--orange-color);
+            font-size: 1.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background: #fffbf0 !important;
+        }
+
+        .bar-cell {
+            background: linear-gradient(135deg, var(--orange-color), var(--orange-light)) !important;
+            border-radius: 8px;
+            position: relative;
+            height: 25px;
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+        }
+
+        /* ===== СТИЛИ КАРТОЧЕК ШАГОВ ===== */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .step-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            padding: var(--card-padding);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(14, 64, 148, 0.05);
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+
+        .step-card::before {
+            content: '';
             position: absolute;
-            bottom: 0;
+            top: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(transparent, rgba(14, 64, 148, 0.9));
-            color: var(--light-text);
-            padding: 15px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-align: center;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
         }
 
-        .preview-text {
-            text-align: center;
-            color: var(--primary-color);
-            font-size: 1.2rem;
+        .step-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .step-card:hover {
+            border-color: var(--secondary-color);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(14, 64, 148, 0.15);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
             margin-bottom: 20px;
-            font-weight: 600;
         }
 
-        .image-modal {
-            display: none;
-            position: fixed;
-            z-index: 3000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            animation: fadeIn 0.3s ease-out;
+        .step-icon {
+            font-size: 3rem;
+            flex-shrink: 0;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
         }
 
-        .image-modal-content {
-            position: relative;
-            max-width: 95%;
-            max-height: 95%;
-            margin: 2.5% auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .step-info {
+            flex: 1;
         }
 
-        .image-modal img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 10px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        .image-close {
-            position: absolute;
-            top: -40px;
-            right: -10px;
-            color: white;
-            font-size: 35px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 3001;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .step-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--primary-color);
             line-height: 1;
+            margin-bottom: 5px;
         }
 
-        .image-close:hover {
-            background: rgba(0, 0, 0, 0.7);
+        .step-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            line-height: 1.3;
+            margin: 0;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .step-items {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
 
+        .step-items li {
+            position: relative;
+            padding: 8px 0 8px 25px;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #475569;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .step-items li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover .step-items li {
+            color: var(--primary-color);
+        }
+
+        .step-card:hover .step-items li::before {
+            opacity: 1;
+            transform: translateX(2px);
+        }
+
+        /* ===== СТИЛИ КАРТОЧЕК СОВЕТОВ ===== */
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+		.tip-card {
+			background: white;
+			border: 1px solid #e2e8f0;
+			border-radius: var(--border-radius);
+			padding: 30px;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			overflow: hidden;
+			box-shadow: 0 4px 15px rgba(14, 64, 148, 0.05);
+		}
+
+		.tip-card::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 4px;
+			background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+			transform: scaleX(0);
+			transition: transform 0.3s ease;
+			transform-origin: center center; /* Изменено с left center */
+		}
+
+
+		.tip-card:hover {
+			border-color: var(--secondary-color);
+			transform: translateY(-10px) scale(1.02);
+			box-shadow: 0 20px 40px rgba(14, 64, 148, 0.15);
+		}
+
+		.tip-card:hover::before {
+			transform: scaleX(1);
+		}
+
+
+        .tip-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+
+        .tip-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tip-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #475569;
+        }
+
+		/* ===== ПРИЗЫВ К ДЕЙСТВИЮ ===== */
+		.cta-section {
+			background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+			border: 2px dashed var(--secondary-color);
+			border-radius: var(--border-radius);
+			padding: 50px 40px;
+			text-align: center;
+			position: relative;
+			overflow: hidden;
+			margin: 60px 0 40px;
+			opacity: 0;
+			transform: translateY(30px);
+			transition: all 0.8s ease;
+		}
+
+		.cta-title {
+			font-size: 2.2em;
+			font-weight: 700;
+			color: var(--primary-color);
+			margin-bottom: 25px;
+		}
+
+		.cta-highlight {
+			background: linear-gradient(135deg, #fef3c7, #fbbf24);
+			border-left: 6px solid var(--warning-color);
+			padding: 25px 30px;
+			border-radius: 0 15px 15px 0;
+			margin: 30px auto;
+			max-width: 800px;
+			font-size: 1.1em;
+			line-height: 1.6;
+			box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2);
+		}
+
+		.cta-buttons {
+			display: flex;
+			justify-content: center;
+			gap: 25px;
+			margin-top: 40px;
+			flex-wrap: wrap;
+		}
+
+		.action-btn {
+			background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+			color: white;
+			border: none;
+			padding: 18px 35px;
+			border-radius: var(--border-radius);
+			font-size: 1.1em;
+			font-weight: 700;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			text-decoration: none;
+			display: inline-flex;
+			align-items: center;
+			gap: 10px;
+			box-shadow: 0 6px 20px rgba(14, 64, 148, 0.3);
+			position: relative;
+			overflow: hidden;
+		}
+
+		.action-btn::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+			transition: left 0.6s ease;
+		}
+
+		.action-btn:hover::before {
+			left: 100%;
+		}
+
+		.action-btn:hover {
+			transform: translateY(-3px) scale(1.05);
+			box-shadow: 0 10px 30px rgba(14, 64, 148, 0.4);
+		}
+
+		.action-btn.secondary {
+			background: linear-gradient(135deg, #6b7280, #4b5563);
+		}
+
+		.action-btn.success {
+			background: linear-gradient(135deg, var(--success-color), #10b981);
+		}
+
+        /* ===== АНИМАЦИИ ===== */
+        .step-card.animate,
+        .tip-card.animate,
+        .cta-section.animate {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Футер */
+        footer {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 0px 0 0px;
+            margin-top: 60px;
+            background-image: url('images/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: multiply;
+            position: relative;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .footer-logo img {
+            width: 0px;
+            height: 0px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-btn {
+            padding: 12px 25px;
+            background-color: var(--light-text);
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-btn:hover {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer-btn.contacts {
+            background-color: transparent;
+            color: var(--light-text);
+            border: 2px solid var(--light-text);
+        }
+
+        .footer-btn.contacts:hover {
+            background-color: var(--light-text);
+            color: var(--primary-color);
+        }
+
+        .footer-btn.feedback::before {
+            content: '📧';
+            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+            line-height: 1;
+            margin-top: -0.5px; 
+        }
+
+		.footer-btn.contacts::before {
+			content: '👥';
+			font-size: 15px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			vertical-align: middle;
+			line-height: 1;
+			margin-top: -0.5px; 
+		}
+
+        .footer-divider {
+            height: 1px;
+            background: linear-gradient(
+                to right,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            margin: 20px 0;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 20px;
+        }
+
+        /* ===== АДАПТИВНОСТЬ ===== */
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2.5rem;
             }
-
+            
             .buttons {
                 flex-direction: column;
                 gap: 15px;
             }
-
-            .card-container {
-                grid-template-columns: 1fr;
+            
+            .timeline-table-container {
+                overflow-x: scroll;
+                padding-bottom: 15px;
             }
             
-            .card-container .card-link:last-child:nth-child(3n + 1) {
-                grid-column: auto;
+            .timeline-table {
+                min-width: 700px;
             }
-
-            .card-title {
-                font-size: 1.3rem;
+            .timeline-table th {
+                font-size: 0.75rem;
+                padding: 10px 5px;
             }
-
-            .screenshot-gallery {
+            .timeline-table td {
+                font-size: 0.7rem;
+                padding: 8px 4px;
+				height: 50px;
+            }
+            .stage-cell {
+                min-width: 180px !important;
+                font-size: 0.75rem !important;
+				height: 50px !important;
+            }
+            .responsible-cell {
+                min-width: 120px !important;
+                font-size: 0.7rem !important;
+				height: 50px !important;
+            }            
+            .steps-grid,
+            .tips-grid {
                 grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .step-header {
+                flex-direction: column;
+                text-align: center;
                 gap: 15px;
             }
             
-            .screenshot-caption {
-                font-size: 0.8rem;
-                padding: 10px;
+            .step-number {
+                font-size: 2rem;
             }
             
-            .image-close {
-                top: -35px;
-                right: -5px;
-                font-size: 30px;
-                width: 35px;
-                height: 35px;
+            .step-title {
+                font-size: 1.1rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                min-width: 250px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 25px;
+            }
+            
+            .footer-buttons {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .footer-btn {
+                min-width: 120px;
+                font-size: 0.9rem;
+                padding: 10px 20px;
+            }
+            
+            .footer-logo {
+                justify-content: center;
+            }
+            
+            .footer-title {
+                font-size: 1.3rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .timeline-table {
+                min-width: 600px;
+                font-size: 0.65rem;
+            }
+            .timeline-table th {
+                font-size: 0.7rem;
+                padding: 8px 3px;
+            }
+			.timeline-table td {
+				height: 45px;
+			}			
+            .stage-cell {
+                min-width: 160px !important;
+                font-size: 0.7rem !important;
+				height: 45px !important;
+            }    
+			.responsible-cell {
+				height: 45px !important;
+			}						
+            .step-card,
+            .tip-card {
+                padding: 20px;
+            }
+
+            .footer-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .footer-btn {
+                width: 200px;
             }
         }
     </style>
@@ -364,92 +849,238 @@
 <body>
     <header id="main-header">
         <div class="container header-content">
-            <img src="images/logo.png" alt="Газпром нефть" class="img-custom" width="100" height="100" />
+            <a href="soder.html" class="logo-link" title="Перейти к содержанию">
+                <img src="images/logo.png" alt="Газпром нефть" class="img-custom" width="100" height="100" />
+            </a>
         </div>
     </header>
-
+    
     <section class="hero" id="hero-section">
         <div class="container hero-content">
-            <h1>НАУЧНЫЙ НАВИГАТОР</h1>
+            <h1 id="hero-title">ДОРОЖНАЯ КАРТА НТК</h1>
             <div class="buttons">
                 <a href="soder.html" class="btn btn-primary">ВЕРНУТЬСЯ К СОДЕРЖАНИЮ</a>
                 <a href="index.html" class="btn btn-primary">ВЕРНУТЬСЯ НА ГЛАВНУЮ СТРАНИЦУ</a>
             </div>
         </div>
     </section>
-
+    
     <section id="content" class="section">
-        <div class="container">
-            <h2 class="section-title">Дорожная карта проведения НТК</h2>
-            
-            
-            <div class="preview-section">
-                <p class="preview-text">Скоро здесь появится расширенное содержание:</p>
-                
-                <div class="screenshot-gallery">
-                    <div class="screenshot-item" onclick="openImageModal('screens/ntk1.jpg')">
-                        <img src="screens/ntk1.jpg" alt="Превью интерфейса 1" class="screenshot-image">
-                        <div class="screenshot-caption">Дорожная карта блок №5</div>
-                    </div>
-                    
-                    <div class="screenshot-item" onclick="openImageModal('screens/ntk2.jpg')">
-                        <img src="screens/ntk2.jpg" alt="Превью интерфейса 2" class="screenshot-image">
-                        <div class="screenshot-caption">Дорожная карта НТК 2025</div>
-                    </div>
-             
-                </div>
+        <div class="container" id="main-content-container">
+            <!-- Контент генерируется из ntk-data.js -->
+            <div id="loading-placeholder" style="text-align: center; padding: 60px 0; color: var(--primary-color);">
+                <h2>⏳ Загрузка дорожной карты НТК...</h2>
+                <p>Пожалуйста, подождите, данные загружаются из ntk-data.js</p>
             </div>
         </div>
     </section>
 
-    <div id="imageModal" class="image-modal">
-        <div class="image-modal-content">
-            <span class="image-close" onclick="closeImageModal()">&times;</span>
-            <img id="modalImage" src="" alt="Увеличенное изображение">
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/logo.png" alt="Газпром нефть" />
+                    <h3 class="footer-title">Научный навигатор</h3>
+                </div>
+                <div></div>
+                <div class="footer-buttons">
+                    <a href="svyaz.html" class="footer-btn feedback">Обратная связь</a>
+                    <a href="team.html" class="footer-btn contacts">Команда</a>
+                </div>
+            </div>
+            <div class="footer-divider"></div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ПАО "Газпром нефть". Команда №6.</p>
+            </div>
         </div>
-    </div>
+    </footer>
 
+    <script src="secret-admin.js"></script>
+    <script src="ntk-data.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            window.openImageModal = function(imageSrc) {
-                const modal = document.getElementById('imageModal');
-                const modalImg = document.getElementById('modalImage');
-                
-                modal.style.display = 'block';
-                modalImg.src = imageSrc;
-                document.body.style.overflow = 'hidden';
-            };
-
-            window.closeImageModal = function() {
-                const modal = document.getElementById('imageModal');
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            };
-
-            const imageModal = document.getElementById('imageModal');
-            imageModal.addEventListener('click', function(e) {
-                if (e.target === imageModal) {
-                    closeImageModal();
-                }
-            });
-            
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && imageModal.style.display === 'block') {
-                    closeImageModal();
-                }
-            });
-        });
-
-        window.addEventListener('scroll', function () {
-            const header = document.getElementById('main-header');
-            const scrollPosition = window.scrollY;
-            if (scrollPosition > 270) {
-                if (header) header.classList.add('scrolled');
-            } else {
-                if (header) header.classList.remove('scrolled');
+        // 🚀 Функция генерации контента из данных
+        function generatePageContent() {
+            if (!window.ntkData) {
+                console.error('❌ ntk-data.js не загружен');
+                document.getElementById('main-content-container').innerHTML = `
+                    <div style="text-align: center; padding: 60px 0; color: var(--error-color);">
+                        <h2>❌ Ошибка загрузки</h2>
+                        <p>Файл ntk-data.js не найден или содержит ошибки</p>
+                    </div>
+                `;
+                return;
             }
+
+            const data = window.ntkData;
+            const container = document.getElementById('main-content-container');
+            
+            // Устанавливаем заголовки
+            document.title = data.pageSettings?.title || 'Дорожная карта НТК';
+            document.getElementById('hero-title').textContent = data.pageSettings?.heroTitle || 'ДОРОЖНАЯ КАРТА НТК';
+            
+            let html = '';
+
+            // 📊 Дорожная карта НТК 2025 (таблица)
+            if (data.timeline) {
+                html += `<h2 class="section-title">${data.timeline.sectionTitle}</h2>`;
+                html += `<div class="timeline-table-container">`;
+                html += `<table class="timeline-table">`;
+                
+                // Заголовки таблицы
+                html += `<thead><tr>`;
+                html += `<th style="width: 25%;">ЭТАПЫ</th><th style="width: 15%;">ОТВЕТСТВЕННЫЕ</th>`;
+                if (data.timeline.months) {
+                    data.timeline.months.forEach(month => {
+                        html += `<th style="width: 5%;">${month}</th>`;
+                    });
+                }
+                html += `</tr></thead>`;
+                
+                // Строки таблицы
+                html += `<tbody>`;
+                if (data.timeline.stages) {
+                    data.timeline.stages.forEach(stage => {
+                        html += `<tr>`;
+                        html += `<td class="stage-cell">${stage.stage || ''}</td>`;
+                        html += `<td class="responsible-cell">${stage.responsible || ''}</td>`;
+                        
+                        // Месяцы (1-12)
+                        for (let i = 1; i <= 12; i++) {
+                            if (stage.special && stage.special.includes(i)) {
+                                html += `<td class="star-cell">★</td>`;
+                            } else if (stage.months && stage.months.includes(i)) {
+                                html += `<td class="bar-cell"></td>`;
+                            } else {
+                                html += `<td></td>`;
+                            }
+                        }
+                        html += `</tr>`;
+                    });
+                }
+                html += `</tbody></table></div>`;
+            }
+
+            // 🎯 Дорожная карта Блок №5
+            if (data.roadmapSteps) {
+                html += `<h2 class="section-title">${data.roadmapSteps.sectionTitle}</h2>`;
+                html += `<div class="steps-grid">`;
+                
+                if (data.roadmapSteps.steps) {
+                    data.roadmapSteps.steps.forEach(step => {
+                        html += `
+                        <div class="step-card">
+                            <div class="step-header">
+                                <div class="step-icon">${step.icon || '🎯'}</div>
+                                <div class="step-info">
+                                    <div class="step-number">${step.number || ''}</div>
+                                    <h3 class="step-title">${step.title || ''}</h3>
+                                </div>
+                            </div>
+                            <ul class="step-items">
+                                ${(step.items || []).map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>`;
+                    });
+                }
+                html += `</div>`;
+            }
+
+            // 💡 Советы
+            if (data.tips && data.tips.tipCards) {
+                html += `<div class="tips-grid">`;
+                data.tips.tipCards.forEach(tip => {
+                    html += `
+                    <div class="tip-card">
+                        <div class="tip-icon">${tip.icon || '💡'}</div>
+                        <h3 class="tip-title">${tip.title || ''}</h3>
+                        <p class="tip-description">${tip.description || ''}</p>
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+
+            // 🎯 Призыв к действию
+            if (data.callToAction) {
+                html += `
+                <div class="cta-section">
+                    <h2 class="cta-title">${data.callToAction.title || ''}</h2>
+                    <div class="cta-highlight">${data.callToAction.highlightText || ''}</div>
+                    <div class="cta-buttons">`;
+                
+                if (data.callToAction.buttons) {
+                    data.callToAction.buttons.forEach(btn => {
+                        html += `<a href="${btn.url || '#'}" class="action-btn ${btn.type || 'primary'}">${btn.text || 'Кнопка'}</a>`;
+                    });
+                }
+                
+                html += `</div></div>`;
+            }
+
+            container.innerHTML = html;
+            console.log('✅ Контент успешно сгенерирован из ntk-data.js');
+        }
+
+        // 🎭 Инициализация анимаций
+        function initializeAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate');
+                    }
+                });
+            }, observerOptions);
+
+            // Добавляем анимации к элементам
+            setTimeout(() => {
+                document.querySelectorAll('.step-card, .tip-card, .cta-section').forEach((el, i) => {
+                    el.style.transitionDelay = `${i * 0.15}s`;
+                    observer.observe(el);
+                });
+            }, 100);
+        }
+
+        // 📜 Скролл эффект для header
+        function initializeScrollEffects() {
+            window.addEventListener('scroll', function () {
+                const header = document.getElementById('main-header');
+                const scrollPosition = window.scrollY;
+                if (scrollPosition > 270) {
+                    if (header) header.classList.add('scrolled');
+                } else {
+                    if (header) header.classList.remove('scrolled');
+                }
+            });
+        }
+
+        // 🚀 Основная инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎯 Инициализация ntk.html...');
+            
+            // Генерируем контент из данных
+            generatePageContent();
+            
+            // Инициализируем анимации
+            initializeAnimations();
+            
+            // Инициализируем скролл эффекты
+            initializeScrollEffects();
+            
+            console.log('✅ ntk.html полностью загружен и инициализирован');
         });
+
+        // 🔄 Перезагрузка при изменении данных (для разработки)
+        if (window.ntkData) {
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'ntk-data-updated') {
+                    location.reload();
+                }
+            });
+        }
     </script>
 </body>
 </html>

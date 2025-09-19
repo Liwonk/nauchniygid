@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель администратора — Научный навигатор</title>
+
+    <!-- Подключение всех модульных редакторов -->
+    <script src="pages-config.js"></script>
+    <script src="auth-advanced.js"></script>
+    <script src="content-editor.js"></script>
+    <script src="svyaz-editor.js"></script>
+    <script src="preim-editor.js"></script>
+    <script src="team-editor.js"></script>
+    <script src="kurator-editor.js"></script>
+    <script src="tema-editor.js"></script>    
+    <script src="obzor-editor.js"></script>    
+    <script src="ntk-editor.js"></script>
+
+    <style>
+        :root {
+            --primary-color:#0e4094;
+            --secondary-color:#1a5bb5;
+            --light-text:#ffffff;
+            --light-bg:#f5f5f5;
+            --success:#28a745;
+            --warning:#ffc107;
+            --danger:#dc3545;
+        }
+
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif}
+        body{background:var(--light-bg);color:#333;line-height:1.6}
+
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(14, 64, 148, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: loginAppear 0.3s ease-out;
+        }
+
+        @keyframes loginAppear {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Стили для obzor-editor */
+        .stage-editor, .challenge-editor, .strategic-editor, .cta-button-editor {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .stage-editor:hover { border-color: #28a745; }
+        .challenge-editor:hover { border-color: #007bff; }
+        .strategic-editor:hover { border-color: #ffc107; }
+        .cta-button-editor:hover { border-color: #dc3545; }
+
+        .stages-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+
+        .checkbox-group label:hover {
+            background-color: #e9ecef;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin: 0;
+            transform: scale(1.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .list-item-editor {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .list-item-editor input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .section-container {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-container h4 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .section-container h5 {
+            color: var(--secondary-color);
+            margin: 20px 0 15px 0;
+            font-size: 1.1rem;
+        }
+
+        /* Стили для модульных редакторов */
+        .benefit-card-editor,
+        .metric-card-editor,
+        .cta-button-editor {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .company-benefit-editor {
+            margin-bottom: 10px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .card-header h4 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.1em;
+        }
+
+        .input-with-delete {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .input-with-delete .form-textarea {
+            flex: 1;
+        }
+
+        .remove-item-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+
+        .remove-item-btn:hover {
+            background: #c82333;
+        }
+
+        .remove-card-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .remove-card-btn:hover {
+            background: #c82333;
+        }
+
+        .add-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: background 0.3s ease;
+        }
+
+        .add-btn:hover {
+            background: #218838;
+        }
+
+        .empty-state {
+            color: #6c757d;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border: 1px dashed #dee2e6;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .section-container {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-container h3.section-title {
+            color: var(--primary-color);
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .section-container h4 {
+            color: var(--secondary-color);
+            font-size: 1.1em;
+            margin: 20px 0 10px 0;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(14, 64, 148, 0.1);
+        }
+
+        /* Стили для content-editor */
+        .content-sections-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+
+        .content-section-editor {
+            display: none;
+            margin-bottom: 25px;
+        }
+
+        .content-section-editor.active {
+            display: block;
+        }
+
+        .modal-card-editor {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .modal-card-editor details {
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            background: #ffffff;
+        }
+
+        .modal-card-editor details summary {
+            padding: 5px 10px;
+            margin: -10px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            cursor: pointer;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .modal-card-editor details[open] summary {
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 15px;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .login-title {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .login-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .login-input {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .login-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 10px rgba(14, 64, 148, 0.2);
+        }
+
+        .login-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(14, 64, 148, 0.3);
+        }
+
+        .login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .login-error {
+            color: var(--danger);
+            background: #ffe6e6;
+            border: 1px solid #ffcccc;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .login-warning {
+            color: #856404;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .admin-content {
+            display: none;
+        }
+
+        .admin-header{background:var(--primary-color);color:var(--light-text);text-align:center;padding:20px 0;box-shadow:0 2px 10px rgba(0,0,0,.1);position:relative}
+        .container{max-width:1200px;margin:0 auto;padding:20px}
+
+        .instructions {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 2px solid #0e4094;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(14, 64, 148, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .instructions::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #0e4094, #1a5bb5, #0e4094);
+            animation: gradientMove 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .instructions h3 {
+            color: #0e4094;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+
+        .instructions h3::before {
+            content: '📋';
+            font-size: 1.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-5px); }
+            60% { transform: translateY(-3px); }
+        }
+
+        .instructions ol {
+            list-style: none;
+            counter-reset: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .instructions li {
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #0e4094;
+            position: relative;
+            transition: all 0.3s ease;
+            margin-left: 0; 
+        }
+
+        .instructions li::before {
+            display: none; 
+        }
+
+        .instructions li::after {
+            content: '✅';
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .instructions li:hover::after {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .instructions li:nth-child(odd) {
+            border-left-color: #0e4094;
+        }
+
+        .instructions li:nth-child(even) {
+            border-left-color: #1a5bb5;
+        }
+
+        .instructions li:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(14, 64, 148, 0.15);
+        }
+
+        .instructions-toggle {
+            background: #0e4094;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 10px rgba(14, 64, 148, 0.3);
+        }
+
+        .instructions-toggle:hover {
+            background: #1a5bb5;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(14, 64, 148, 0.4);
+        }
+
+        .instructions-toggle .toggle-icon {
+            transition: transform 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .instructions-toggle.collapsed .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .instructions-content {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+            opacity: 1;
+        }
+
+        .instructions-content.hidden {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .instructions.collapsed {
+            padding: 0;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+            margin: 10px 0;
+        }
+
+        .instructions.collapsed::before {
+            display: none;
+        }
+
+        .remember-me-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #666;
+            cursor: pointer;
+            margin: 10px 0;
+            user-select: none;
+        }
+
+        .remember-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .remember-me-container:hover {
+            color: var(--primary-color);
+        }
+        
+        .logout-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            white-space: nowrap;
+            min-width: auto;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .logout-btn.full-logout {
+            background: rgba(220, 53, 69, 0.8);
+            border-color: rgba(220, 53, 69, 0.9);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn.full-logout:hover {
+            background: rgba(220, 53, 69, 1);
+            border-color: rgba(220, 53, 69, 1);
+            transform: translateY(-1px);
+        }
+        .step-items-editor {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #fafbff;
+        }
+
+        .step-item-editor {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .step-item-editor:hover {
+            border-color: var(--secondary-color);
+            box-shadow: 0 2px 8px rgba(14, 64, 148, 0.1);
+        }
+
+        .step-item-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .step-item-header label {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .step-item-header select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .link-fields {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 5px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .link-fields .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .user-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+        }
+
+        .page-selector{background:#fff;margin:20px 0;padding:30px;border-radius:15px;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+        .page-selector h2{text-align:center;color:var(--primary-color);margin-bottom:20px;font-size:1.8rem}
+
+        .pages-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+        .page-card{background:linear-gradient(135deg,#f8f9fa,#e9ecef);border:2px solid #dee2e6;border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:.3s;position:relative}
+        .page-card:hover{transform:translateY(-5px);box-shadow:0 8px 25px rgba(14,64,148,.2);border-color:var(--primary-color)}
+        .page-card.selected{background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));color:#fff;border-color:var(--primary-color)}
+        .page-icon{font-size:2.5rem;margin-bottom:15px}
+        .page-title{font-weight:bold;margin-bottom:10px}
+        .page-description{font-size:.9rem;opacity:.8;margin-bottom:10px}
+        .page-file{font-size:.8rem;font-family:monospace;background:rgba(0,0,0,.08);padding:4px 8px;border-radius:4px}
+        .page-card.selected .page-file{background:rgba(255,255,255,.2)}
+
+        .page-status{position:absolute;top:10px;right:10px;padding:4px 8px;border-radius:12px;font-size:.7rem;font-weight:bold;text-transform:uppercase}
+        .status-active{border-color:var(--primary-color)}
+        .status-active .page-status{background:var(--success);color:#fff}
+        .status-development{opacity:.7;border-color:#808080}
+        .status-development .page-status{background:#6c757d;color:#fff}
+
+        .editor-container{display:none;background:#fff;padding:30px;margin:20px 0;border-radius:15px;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+        .editor-container.active{display:block}
+        .editor-header{display:flex;justify-content:space-between;align-items:center;padding-bottom:15px;border-bottom:2px solid var(--light-bg);margin-bottom:20px}
+        .editor-title{font-size:1.5rem;color:var(--primary-color)}
+        .back-btn{background:#6c757d;color:#fff;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;transition:.3s}
+        .back-btn:hover{background:#5a6268;transform:translateY(-2px)}
+        .section-title{color:var(--primary-color);margin-bottom:15px;border-bottom:1px solid #dee2e6;padding-bottom:8px;font-size:1.3rem}
+
+        .form-group{margin-bottom:20px}
+        label{display:block;margin-bottom:8px;font-weight:600;color:var(--primary-color)}
+        input,textarea,select{width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:14px}
+        input:focus,textarea:focus,select:focus{border-color:var(--primary-color);outline:none;box-shadow:0 0 5px rgba(14,64,148,.3)}
+        textarea{min-height:120px;resize:vertical;font-family:monospace}
+
+        .btn-group{display:flex;gap:10px;justify-content:center;margin-top:20px}
+        .btn{padding:12px 25px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;transition:.3s}
+        .btn-save{background:var(--success);color:#fff}.btn-save:hover{background:#218838;transform:translateY(-2px)}
+        .btn-preview{background:var(--warning);color:#212529}.btn-preview:hover{background:#e0a800;transform:translateY(-2px)}
+
+        .modal-sections-tabs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:20px;border-bottom:2px solid #dee2e6;padding-bottom:10px}
+        .section-tab{padding:8px 16px;border:1px solid #dee2e6;border-radius:5px;background:#f8f9fa;cursor:pointer;font-size:.85rem;transition:.3s}
+        .section-tab:hover{background:#e9ecef}
+        .section-tab.active{background:var(--primary-color);color:#fff;border-color:var(--primary-color)}
+
+        .modal-section-editor{display:none;margin-bottom:25px}.modal-section-editor.active{display:block}
+        .modal-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+        .add-card-btn{background:#17a2b8;color:#fff;border:none;border-radius:5px;padding:10px 20px;cursor:pointer;margin-bottom:20px}
+
+        .kurator-editor, .people-editor, .contacts-editor, .team-editor{background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:20px;margin-bottom:20px}
+        .kurator-header, .people-header, .contact-header, .team-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+        .kurator-header h4, .people-header h4, .contact-header h6, .team-header h4{margin:0;color:var(--primary-color);font-size:1.2rem}
+
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+        .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px}
+        .form-row .form-group{margin-bottom:15px}
+
+        .list-editor{background:#fff;border:1px solid #ddd;border-radius:5px;padding:10px}
+        .list-item{display:flex;gap:10px;margin-bottom:10px;align-items:center}
+        .list-item input{flex:1;margin-bottom:0}
+        .list-item .remove-btn{background:var(--danger);color:#fff;border:none;width:30px;height:30px;border-radius:5px;cursor:pointer}
+
+        .option-editor{background:#f1f3f4;border:1px solid #ccc;border-radius:8px;padding:10px;margin-bottom:10px}
+        .option-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+
+        .status-message{display:none;padding:15px;border-radius:8px;font-weight:bold;text-align:center;margin:15px 0}
+        .status-success{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
+        .status-error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+        .status-info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb}
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(14, 64, 148, 0.1);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media(max-width:768px){
+            .pages-grid{grid-template-columns:1fr}
+            .editor-header{flex-direction:column;gap:10px;text-align:center}
+            .btn-group{flex-direction:column}
+            .modal-sections-tabs{flex-direction:column}
+            .form-row{grid-template-columns:1fr}
+            .form-row-3{grid-template-columns:1fr}
+            
+            .login-container {
+                padding: 30px 20px;
+            }
+
+            .instructions {
+                padding: 20px 15px;
+                margin: 15px 0;
+            }
+            
+            .instructions li {
+                padding: 12px 15px;
+                margin-left: 15px;
+            }
+            
+            .instructions h3 {
+                font-size: 1.2rem;
+            }
+
+            .logout-buttons {
+                position: static;
+                margin: 10px auto;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .user-info {
+                position: static;
+                margin: 10px auto;
+                text-align: center;
+                display: block;
+            }
+            .stages-checkboxes {
+                grid-template-columns: 1fr;
+            }
+            .section-container {
+                padding: 15px;
+            }						
+        }
+    </style>
+</head>
+<body>
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-container">
+            <div class="login-logo">🛠️</div>
+            <h1 class="login-title">Панель администратора</h1>
+            <p class="login-subtitle">Научный навигатор – Газпром нефть</p>
+            
+            <form id="loginForm" class="login-form">
+                <input 
+                    type="text" 
+                    id="loginUsername" 
+                    class="login-input" 
+                    placeholder="Логин" 
+                    required 
+                    autocomplete="username"
+                >
+                <input 
+                    type="password" 
+                    id="loginPassword" 
+                    class="login-input" 
+                    placeholder="Пароль" 
+                    required 
+                    autocomplete="current-password"
+                >
+                
+                <label class="remember-me-container">
+                    <input type="checkbox" id="rememberMe" class="remember-checkbox">
+                    <span class="checkmark"></span>
+                    Запомнить меня на 7 дней
+                </label>
+                
+                <button type="submit" id="loginBtn" class="login-btn">Войти</button>
+                
+                <div id="loginError" class="login-error"></div>
+                <div id="loginWarning" class="login-warning"></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="adminContent" class="admin-content">
+        <div class="admin-header">
+            <div class="user-info" id="userInfo">👤 Администратор</div>
+            <h1>🛠️ Панель администратора</h1>
+            <p>Научный навигатор – Газпром нефть</p>
+            <div class="logout-buttons">
+                <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+                <button class="logout-btn full-logout" onclick="fullLogout()" title="Полный выход с удалением сохраненных данных">🔒 Полный выход</button>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="instructions" id="instructionsBlock">
+                <button class="instructions-toggle" id="instructionsToggle">
+                    <span class="toggle-icon">🔽</span>
+                    <span id="toggleText">Скрыть инструкцию</span>
+                </button>
+                
+                <div class="instructions-content" id="instructionsContent">
+                    <h3>Инструкция:</h3>
+                    <ol>
+                        <li>Выберите страницу для редактирования.</li>
+                        <li>Отредактируйте контент в правой части.</li>
+                        <li>При необходимости посмотрите «Предварительный просмотр».</li>
+                        <li>Нажмите «Скачать обновлённый файл» – браузер выдаст файл .js.</li>
+                        <li>Замените им файл данных в проекте.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div id="pageSelector" class="page-selector">
+                <h2>🎯 Выберите страницу</h2>
+                <div id="pagesGrid" class="pages-grid"></div>
+            </div>
+
+            <div id="editorContainer" class="editor-container">
+                <div class="editor-header">
+                    <h2 id="editorTitle" class="editor-title"></h2>
+                    <button class="back-btn" onclick="backToPageSelector()">← К страницам</button>
+                </div>
+                <div id="contentEditor" class="content-editor"></div>
+                <div id="statusMessage" class="status-message"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    checkAuthStatus();
+    setupLoginForm();
+    setupInstructionsToggle();
+});
+
+function checkAuthStatus() {
+    const session = window.AuthManager.validateSession();
+    
+    if (session) {
+        if (session.autoLogin) {
+            console.log('🔄 Автоматический вход выполнен');
+        }
+        showAdminPanel(session.user, session.role);
+    } else {
+        showLoginScreen();
+    }
+}
+
+function showLoginScreen() {
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('adminContent').style.display = 'none';
+    
+    if (window.AuthManager.isLocked()) {
+        const remaining = window.AuthManager.getRemainingLockoutTime();
+        showWarning(`🔒 Слишком много неудачных попыток. Доступ заблокирован на ${remaining} мин.`);
+    }
+    
+    setTimeout(() => {
+        document.getElementById('loginUsername').focus();
+    }, 300);
+}
+
+function showAdminPanel(username, role) {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('adminContent').style.display = 'block';
+    document.getElementById('userInfo').textContent = `👤 ${username} (${role})`;
+    
+    initializeAdminPanel();
+}
+
+function setupLoginForm() {
+    const form = document.getElementById('loginForm');
+    const usernameInput = document.getElementById('loginUsername');
+    const passwordInput = document.getElementById('loginPassword');
+    const rememberMeCheckbox = document.getElementById('rememberMe');
+    const loginBtn = document.getElementById('loginBtn');
+    const errorDiv = document.getElementById('loginError');
+    const warningDiv = document.getElementById('loginWarning');
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        attemptLogin();
+    });
+
+    function attemptLogin() {
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+        const rememberMe = rememberMeCheckbox.checked;
+
+        hideMessages();
+        
+        if (window.AuthManager.isLocked()) {
+            const remaining = window.AuthManager.getRemainingLockoutTime();
+            showWarning(`🔒 Доступ заблокирован. Осталось: ${remaining} мин.`);
+            return;
+        }
+        
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Проверка...';
+
+        setTimeout(() => {
+            const result = window.AuthManager.authenticate(username, password, rememberMe);
+            
+            if (result && !result.error) {
+                showAdminPanel(result.user, result.role);
+                form.reset();
+            } else if (result && result.error) {
+                showError(result.error);
+            } else {
+                const attempts = window.AuthManager.getAttempts();
+                const remaining = 5 - attempts.count;
+                
+                if (remaining > 0) {
+                    showError(`❌ Неверный логин или пароль. Осталось попыток: ${remaining}`);
+                } else {
+                    showError('❌ Неверный логин или пароль');
+                }
+                
+                shakeForm();
+            }
+            
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Войти';
+        }, 1000);
+    }
+
+    function showError(message) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        warningDiv.style.display = 'none';
+    }
+
+    function showWarning(message) {
+        warningDiv.textContent = message;
+        warningDiv.style.display = 'block';
+        errorDiv.style.display = 'none';
+    }
+
+    function hideMessages() {
+        errorDiv.style.display = 'none';
+        warningDiv.style.display = 'none';
+    }
+
+    function shakeForm() {
+        const container = document.querySelector('.login-container');
+        container.style.animation = 'none';
+        container.style.transform = 'translateX(-10px)';
+        setTimeout(() => container.style.transform = 'translateX(10px)', 100);
+        setTimeout(() => container.style.transform = 'translateX(0)', 200);
+    }
+}
+
+function logout() {
+    const isRemembered = window.AuthManager.isRemembered();
+    
+    let message = '🚪 Вы уверены, что хотите выйти из панели администратора?';
+    
+    if (isRemembered) {
+        message += '\n\n💡 Ваши данные для входа сохранены - в следующий раз вход будет автоматическим.';
+    }
+    
+    if (confirm(message)) {
+        window.AuthManager.logout(true);
+        
+        showLoginScreen();
+        resetEditorState();
+        
+        if (isRemembered) {
+            setTimeout(() => {
+                const loginContainer = document.querySelector('.login-container');
+                if (loginContainer) {
+                    const infoDiv = document.createElement('div');
+                    infoDiv.style.cssText = `
+                        background: #d1ecf1;
+                        color: #0c5460;
+                        padding: 10px;
+                        border-radius: 5px;
+                        margin-top: 15px;
+                        font-size: 0.9rem;
+                        text-align: center;
+                        border: 1px solid #bee5eb;
+                    `;
+                    infoDiv.innerHTML = '💾 Данные для входа сохранены. При перезагрузке страницы вход будет автоматическим.';
+                    loginContainer.appendChild(infoDiv);
+                    
+                    setTimeout(() => {
+                        infoDiv.remove();
+                    }, 5000);
+                }
+            }, 500);
+        }
+    }
+}
+
+function resetEditorState() {
+    currentPageKey = null;
+    currentPageConf = null;
+    currentData = null;
+    
+    const editorWrap = document.getElementById('editorContainer');
+    const pageSelect = document.getElementById('pageSelector');
+    
+    if (editorWrap) editorWrap.classList.remove('active');
+    if (pageSelect) pageSelect.style.display = 'block';
+    
+    document.querySelectorAll('.page-card').forEach(c => c.classList.remove('selected'));
+}
+
+function setupInstructionsToggle() {
+    const toggleBtn = document.getElementById('instructionsToggle');
+    const content = document.getElementById('instructionsContent');
+    const toggleText = document.getElementById('toggleText');
+    const block = document.getElementById('instructionsBlock');
+    
+    if (!toggleBtn || !content) return;
+    
+    const isHidden = localStorage.getItem('instructionsHidden') === 'true';
+    
+    if (isHidden) {
+        hideInstructions(true);
+    }
+    
+    toggleBtn.addEventListener('click', () => {
+        const isCurrentlyHidden = content.classList.contains('hidden');
+        
+        if (isCurrentlyHidden) {
+            showInstructions();
+        } else {
+            hideInstructions();
+        }
+    });
+    
+    function hideInstructions(skipAnimation = false) {
+        content.classList.add('hidden');
+        block.classList.add('collapsed');
+        toggleBtn.classList.add('collapsed');
+        toggleText.textContent = 'Показать инструкцию';
+        
+        localStorage.setItem('instructionsHidden', 'true');
+        
+        if (skipAnimation) {
+            content.style.transition = 'none';
+            setTimeout(() => {
+                content.style.transition = '';
+            }, 50);
+        }
+    }
+    
+    function showInstructions() {
+        content.classList.remove('hidden');
+        block.classList.remove('collapsed');
+        toggleBtn.classList.remove('collapsed');
+        toggleText.textContent = 'Скрыть инструкцию';
+        
+        localStorage.setItem('instructionsHidden', 'false');
+    }
+}
+
+function initializeAdminPanel() {
+    renderPageCards();
+}
+
+const pagesGrid = document.getElementById('pagesGrid');
+const pageSelect = document.getElementById('pageSelector');
+const editorWrap = document.getElementById('editorContainer');
+const editorTitle = document.getElementById('editorTitle');
+const contentEdit = document.getElementById('contentEditor');
+const statusMsg = document.getElementById('statusMessage');
+
+let currentPageKey = null;
+let currentPageConf = null;
+let currentData = null;
+
+function renderPageCards(){
+    if (!pagesGrid) return;
+    
+    pagesGrid.innerHTML = '';
+    for(const key of Object.keys(window.pagesConfig)){
+        const p = window.pagesConfig[key];
+        const card = document.createElement('div');
+        card.className = `page-card status-${p.status}`;
+        card.innerHTML = `
+            <span class="page-status ${p.status}">${p.status==='active'?'Готово':'В разработке'}</span>
+            <span class="page-icon">${p.icon}</span>
+            <div class="page-title">${p.title}</div>
+            <div class="page-description">${p.description}</div>
+            <div class="page-file">${p.file}</div>
+        `;
+        card.onclick = () => openEditor(key);
+        pagesGrid.appendChild(card);
+    }
+}
+
+async function openEditor(pageKey){
+    currentPageKey = pageKey;
+    currentPageConf = window.pagesConfig[pageKey];
+
+    document.querySelectorAll('.page-card').forEach(c=>c.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+
+    try{
+        if(currentPageConf.dataFile) await loadScriptOnce(currentPageConf.dataFile);
+    }catch(e){
+        console.warn('Данные не найдены, будет создана пустая структура');
+    }
+
+    // Загрузка данных для каждого типа редактора
+    if(currentPageConf.dataFile === 'kurator-data.js' && window.kuratorData) {
+        currentData = JSON.parse(JSON.stringify(window.kuratorData));
+    }
+    else if(currentPageConf.dataFile === 'preim-data.js' && window.preimData) {
+        currentData = JSON.parse(JSON.stringify(window.preimData));
+    }
+    else if(currentPageConf.type==='modal-content' && window.modalContentData ) {
+        currentData = JSON.parse(JSON.stringify(window.modalContentData));
+    }
+    else if(currentPageConf.type==='page-content' && window.pageData) {
+        currentData = JSON.parse(JSON.stringify(window.pageData));
+    }
+    else if(currentPageConf.dataFile === 'svyaz-data.js' && window.svyazData) {
+        currentData = JSON.parse(JSON.stringify(window.svyazData));
+    }
+    else if(currentPageConf.type==='people-content'&& window.peopleData) {
+        currentData = JSON.parse(JSON.stringify(window.peopleData));
+    }
+    else if(currentPageConf.dataFile === 'team-data.js' && window.teamData) {
+        currentData = JSON.parse(JSON.stringify(window.teamData));
+    }
+    else if(currentPageConf.dataFile === 'tema-data.js' && window.temaData) {
+        currentData = JSON.parse(JSON.stringify(window.temaData));
+    }
+    else if(currentPageConf.dataFile === 'obzor-data.js' && window.obzorData) {
+        currentData = JSON.parse(JSON.stringify(window.obzorData));
+    }
+    else if(currentPageConf.dataFile === 'ntk-data.js' && window.ntkData) {
+        currentData = JSON.parse(JSON.stringify(window.ntkData));
+    }
+    else {
+        console.log('⚠️ Данные не найдены, создается заглушка для:', currentPageConf.dataFile);
+        createEmptyData();
+    }
+
+    pageSelect.style.display='none';
+    editorWrap.classList.add('active');
+    editorTitle.textContent = `Редактирование: ${currentPageConf.title}`;
+    buildEditorUI();
+}
+
+function loadScriptOnce(src){
+    return new Promise((res,rej)=>{
+        if(document.querySelector(`script[src="${src}"]`)) return res();
+        const s=document.createElement('script');
+        s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);
+    });
+}
+
+function createEmptyData(){
+    if(currentPageConf.dataFile === 'kurator-data.js') {
+        currentData = {
+            pageTitle: 'Список кураторов НТК',
+            mainSection: {title: 'Список кураторов НТК', description: 'Описание'},
+            curators: [],
+            filterOptions: {departments: ['Все департаменты'], specializations: ['Все специализации'], experience: ['Любой опыт']}
+        };
+    }
+    else if(currentPageConf.dataFile === 'preim-data.js') {
+        currentData = {
+            pageSettings: {
+                title: 'Преимущества участия в НТК',
+                heroTitle: 'НАУЧНЫЙ НАВИГАТОР',
+                mainSectionTitle: 'Преимущества участия в НТК'
+            },
+            youngSpecialists: {
+                sectionTitle: 'Для молодых специалистов',
+                sectionSubtitle: 'Развивайте ключевые профессиональные навыки',
+                benefits: []
+            },
+            curators: {
+                sectionTitle: 'Для кураторов',
+                sectionSubtitle: 'Развивайте лидерские компетенции',
+                benefits: []
+            },
+            company: {
+                sectionTitle: 'Для компании',
+                sectionSubtitle: 'Стратегические преимущества',
+                benefits: [],
+                metrics: []
+            },
+            callToAction: {
+                title: 'Готовы начать свой путь в НТК?',
+                highlightText: 'Важно: Участие в НТК — это инвестиция в ваше будущее.',
+                buttons: []
+            }
+        };
+    }
+    else if(currentPageConf.dataFile === 'obzor-data.js') {
+        currentData = {
+            pageSettings: {
+                title: 'Обзор структуры компании и текущих вызовов',
+                heroTitle: 'НАУЧНЫЙ НАВИГАТОР',
+                mainSectionTitle: 'Обзор структуры компании и текущих вызовов',
+                lastUpdated: new Date().toISOString()
+            },
+            companyIntro: {
+                sectionTitle: 'ПАО «Газпром нефть»',
+                sectionSubtitle: 'Интегрированная нефтегазовая компания полного цикла',
+                description: '«Газпром нефть» реализует полный цикл операций: от разведки и добычи углеводородов до переработки нефти и реализации продукции.'
+            },
+            challengesMatrix: {
+                sectionTitle: 'Текущие вызовы перед компанией',
+                sectionSubtitle: 'Соответствие технологических вызовов этапам развития активов',
+                stages: [],
+                challenges: []
+            },
+            strategicChallenges: {
+                sectionTitle: 'Ключевые технологические вызовы по стратегическим ставкам',
+                sectionSubtitle: 'Технологические решения для различных регионов и направлений деятельности',
+                challenges: []
+            },
+            solutionStats: {
+                sectionTitle: 'Результаты работы с вызовами',
+                totalChallenges: '57+',
+                challengesDescription: 'Крупные тех. вызовы проработаны',
+                totalDirections: '6',
+                directionsDescription: 'Комплексных направлений тех. развития сформировано'
+            },
+            callToAction: {
+                title: 'Готовы решать технологические вызовы?',
+                highlightText: 'Важно: НТК — это ваша возможность предложить инновационные решения для развития отрасли.',
+                buttons: []
+            }
+        };
+    }
+    else if(currentPageConf.dataFile === 'ntk-data.js') {
+    currentData = {
+        pageSettings: {
+            title: "Дорожная карта НТК",
+            heroTitle: "ДОРОЖНАЯ КАРТА НТК",
+            mainSectionTitle: "Дорожная карта НТК 2025",
+            lastUpdated: new Date().toISOString()
+        },
+        timeline: {
+            sectionTitle: "ДОРОЖНАЯ КАРТА НТК 2025",
+            sectionSubtitle: "План проведения научно-технической конференции",
+            months: ["янв", "февр", "март", "апр", "май", "июнь", "июль", "авг", "сент", "окт", "нояб", "дек"],
+            stages: []
+        },
+        roadmapSteps: {
+            sectionTitle: "ДОРОЖНАЯ КАРТА БЛОК №5",
+            sectionSubtitle: "Пошаговый алгоритм подготовки к НТК",
+            steps: []
+        },
+        tips: {
+            sectionTitle: "Рекомендации участникам",
+            sectionSubtitle: "Важные советы для успешного участия в НТК",
+            tipCards: []
+        },
+        callToAction: {
+            title: "Готовы начать свой путь в НТК?",
+            highlightText: "Важно: Участие в НТК — это инвестиция в ваше профессиональное будущее.",
+            buttons: []
+        }
+    };
+}
+    else if(currentPageConf.dataFile === 'tema-data.js') {
+        currentData = {
+            pageSettings: {
+                title: 'Выбор темы для участия в НТК',
+                heroTitle: 'НАУЧНЫЙ НАВИГАТОР',
+                mainSectionTitle: 'Выбор темы для участия в НТК',
+                lastUpdated: new Date().toISOString()
+            },
+            algorithm: {
+                sectionTitle: 'Алгоритм выбора темы для НТК',
+                sectionSubtitle: 'Пошаговое руководство для правильного выбора темы вашего проекта',
+                steps: []
+            },
+            implementation: {
+                sectionTitle: 'Реализация проекта',
+                sectionSubtitle: 'Практические шаги для успешной реализации вашего проекта НТК',
+                phases: []
+            },
+            evaluationCriteria: {
+                sectionTitle: 'Система оценки проектов НТК',
+                sectionSubtitle: 'Шкала баллов по каждому критерию (максимум 3 балла за каждый критерий)',
+                maxTotalScore: 21,
+                criteria: []
+            },
+            additionalInfo: {
+                sectionTitle: 'Дополнительная информация',
+                sectionSubtitle: 'Важные рекомендации для успешного участия в НТК',
+                tips: []
+            },
+            callToAction: {
+                title: 'Готовы выбрать тему для НТК?',
+                highlightText: 'Важно: Правильный выбор темы — это 50% успеха вашего проекта на НТК. Следуйте алгоритму и консультируйтесь с экспертами.',
+                buttons: []
+            }
+        };
+    }
+    else if(currentPageConf.type==='modal-content') {
+        currentData = { 'section':{title:'Новый раздел',description:'Описание',cards:[{title:'Новая карточка',text:'li пункт'}]} };
+    }
+    else if(currentPageConf.type==='page-content') {
+        currentData = {title:'Заголовок',subtitle:'Подзаголовок',content:'Контент'};
+    }
+    else if(currentPageConf.dataFile === 'svyaz-data.js') {
+        currentData = {
+            pageTitle: 'Обратная связь',
+            mainSection: {title: 'Обратная связь', subtitle: 'Подзаголовок'},
+            form: {fields: {}},
+            helpSection: {contacts: []},
+            emailConfig: {recipients: '', subject: ''}
+        };
+    }
+    else if(currentPageConf.type==='people-content') {
+        currentData = {
+            pageTitle: 'Список людей',
+            mainSection: {title: 'Список людей', description: 'Описание'},
+            people: [],
+            categories: ['Все категории']
+        };
+    }
+    else if(currentPageConf.dataFile === 'team-data.js') {
+        currentData = {
+            pageTitle: 'Команда проекта',
+            hero: {title: 'НАУЧНЫЙ НАВИГАТОР', pageTitle: 'Команда проекта'},
+            mainSection: {title: 'Команда проекта', description: 'Наша команда — это профессионалы, которые сделали этот сайт возможным'},
+            team: [],
+            lastUpdated: new Date().toLocaleString('ru-RU')
+        };
+    }
+    else {
+        currentData = {};
+    }
+}
+
+// КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: Используем модульные редакторы
+function buildEditorUI(){
+    if(currentPageConf.dataFile === 'kurator-data.js') {
+        KuratorEditor.build();
+    }
+    else if(currentPageConf.dataFile === 'preim-data.js') {
+        PreimEditor.build();
+    }
+    else if(currentPageConf.dataFile === 'team-data.js') {
+        TeamEditor.build();
+    }
+    else if(currentPageConf.dataFile === 'tema-data.js') {
+        TemaEditor.build();
+    }
+    else if(currentPageConf.dataFile === 'svyaz-data.js') {
+        SvyazEditor.build();
+    }
+    else if(currentPageConf.dataFile === 'obzor-data.js') {
+        ObzorEditor.build();
+    }
+    else if(currentPageConf.dataFile === 'ntk-data.js') {
+        NtkEditor.build();
+    }
+    else if(currentPageConf.type==='modal-content') {
+        ContentEditor.build();
+    }
+    else if(currentPageConf.type==='page-content') {
+        buildSimplePageEditor();
+    }
+    else if(currentPageConf.type==='people-content') {
+        buildPeopleEditor();
+    }
+    else {
+        buildGenericEditor();
+    }
+}
+
+// Простые встроенные редакторы
+function buildSimplePageEditor(){
+    contentEdit.innerHTML = `
+      <h3 class="section-title">Страница</h3>
+      <div class="form-group"><label>Заголовок</label><input id="pg-title" value="${currentData.title||''}"></div>
+      <div class="form-group"><label>Подзаголовок</label><input id="pg-sub" value="${currentData.subtitle||''}"></div>
+      <div class="form-group"><label>Контент</label><textarea id="pg-content">${currentData.content||''}</textarea></div>
+      <div class="btn-group">
+          <button class="btn btn-preview" onclick="previewSimple()">👁️ Предпросмотр</button>
+          <button class="btn btn-save" onclick="saveSimple()">💾 Скачать файл</button>
+      </div>`;
+}
+
+window.previewSimple=()=>{
+    openPreview(`<h1>${val('pg-title')}</h1><h3>${val('pg-sub')}</h3><p>${val('pg-content').replace(/\n/g,'<br>')}</p>`);
+};
+window.saveSimple=()=>{
+    const data={title:val('pg-title'),subtitle:val('pg-sub'),content:val('pg-content')};
+    downloadJS(currentPageConf.dataFile||'page-data.js','window.pageData',data);
+};
+
+function buildPeopleEditor(){
+    contentEdit.innerHTML = `
+        <h3 class="section-title">👥 Редактирование списка людей</h3>
+        <p style="background: #d4edda; padding: 10px; border-radius: 5px; color: #155724; margin-bottom: 20px;">
+            <strong>✅ Загружены данные из people-data.js</strong>
+        </p>
+        <div class="form-group">
+            <label>Заголовок страницы:</label>
+            <input type="text" id="people-page-title" value="${currentData.pageTitle || ''}" placeholder="Заголовок страницы">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-save" onclick="savePeople()">💾 Скачать people-data.js</button>
+        </div>
+    `;
+}
+
+window.savePeople = () => {
+    const outputData = {
+        ...currentData,
+        pageTitle: val('people-page-title'),
+        lastUpdated: new Date().toLocaleString('ru-RU')
+    };
+    downloadJS('people-data.js', 'window.peopleData', outputData);
+};
+
+function buildGenericEditor(){
+    contentEdit.innerHTML=`<p>Редактор для типа <b>${currentPageConf.type}</b> пока не реализован.</p>`;
+}
+
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+function val(id){return document.getElementById(id)?.value||'';}
+
+function downloadJS(filename,globalVarName,obj){
+    const js = `// ${filename} – сгенерировано ${new Date().toLocaleString('ru-RU')}\n${globalVarName} = ${JSON.stringify(obj,null,2)};\n\nconsole.log('${filename} загружен');`;
+    const url = URL.createObjectURL(new Blob([js],{type:'application/javascript'}));
+    const a = document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    flash('📥 Файл скачан!',true);
+}
+
+function openPreview(html){
+    const w=window.open('','_blank','width=900,height=700');w.document.write(html);
+}
+
+function flash(txt,ok){
+    if (!statusMsg) return;
+    statusMsg.textContent=txt;
+    statusMsg.className=`status-message ${ok?'status-success':'status-error'}`;
+    statusMsg.style.display='block';
+    setTimeout(()=>statusMsg.style.display='none',4000);
+}
+
+window.backToPageSelector = ()=>{
+    if (editorWrap) editorWrap.classList.remove('active');
+    if (pageSelect) pageSelect.style.display='block';
+    currentPageKey=null;currentData=null;
+};
+
+let inactivityTimer;
+
+function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+        alert('⏰ Сессия истекла. Вы будете автоматически разлогинены.');
+        logout();
+    }, 4 * 60 * 60 * 1000);
+}
+
+['mousedown', 'keydown', 'scroll', 'click'].forEach(event => {
+    document.addEventListener(event, resetInactivityTimer, true);
+});
+
+function fullLogout() {
+    if (confirm('🔒 Полный выход удалит ВСЕ сохраненные данные для входа.\n\nВы уверены?')) {
+        window.AuthManager.fullLogout();
+        showLoginScreen();
+        resetEditorState();
+        
+        setTimeout(() => {
+            const loginContainer = document.querySelector('.login-container');
+            if (loginContainer) {
+                const infoDiv = document.createElement('div');
+                infoDiv.style.cssText = `
+                    background: #f8d7da;
+                    color: #721c24;
+                    padding: 10px;
+                    border-radius: 5px;
+                    margin-top: 15px;
+                    font-size: 0.9rem;
+                    text-align: center;
+                    border: 1px solid #f5c6cb;
+                `;
+                infoDiv.innerHTML = '🗑️ Все сохраненные данные удалены. Потребуется повторный ввод логина и пароля.';
+                loginContainer.appendChild(infoDiv);
+                
+                setTimeout(() => {
+                    infoDiv.remove();
+                }, 5000);
+            }
+        }, 500);
+    }
+}
+</script>
+</body>
+</html>

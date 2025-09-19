@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Научный навигатор - Газпром нефть</title>
+    <script src="svyaz-data.js"></script>
+    <style>
+        :root {
+            --primary-color: #0e4094;
+            --secondary-color: #1a5bb5;
+            --accent-color: #0071bc;
+            --text-color: #333333;
+            --light-text: #ffffff;
+            --light-bg: #f5f5f5;
+            --border-radius: 20px;
+            --card-padding: 25px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+		#admin-overlay {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+		}
+
+		#admin-notification {
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+		}
+
+		/* Анимация для loading уведомления */
+		#admin-notification:has-text("Загрузка") {
+			animation: pulse 1.5s ease-in-out infinite;
+		}
+
+		@keyframes pulse {
+			0%, 100% { opacity: 1; }
+			50% { opacity: 0.7; }
+		}
+
+		/* Отключаем скролл страницы когда открыта админ-панель */
+		body:has(#admin-overlay) {
+			overflow: hidden;
+		}		
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: transparent;
+            color: var(--light-text);
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        header.scrolled {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            background-image: url('images/background.jpg');
+            background-size: cover;
+            background-position: 100% 92.5%;
+            background-blend-mode: multiply;
+            margin-top: 10;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .img-custom {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .hero {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 120px 0 60px;
+            background-image: url('images/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: multiply;
+            position: relative;
+            margin-top: 0;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            z-index: 1;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background-color: var(--light-text);
+            color: var(--primary-color);
+            border: 2px solid var(--light-text);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            border: 2px solid var(--secondary-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+            font-size: 2.2rem;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        /* =============== СТИЛИ ДЛЯ ФОРМЫ ОБРАТНОЙ СВЯЗИ =============== */
+        .feedback-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .feedback-form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .feedback-form-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .feedback-form-section p {
+            margin-bottom: 25px;
+            opacity: 0.8;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(14, 64, 148, 0.3);
+        }
+
+        .form-control[readonly] {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* =============== СООБЩЕНИЯ =============== */
+        .info-message, .error-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .info-message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* =============== СЕКЦИЯ ПОМОЩИ =============== */
+        .help-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .help-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .help-section p {
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .help-contact {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--light-bg);
+            border-radius: 10px;
+        }
+
+        .contact-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            margin-top: 5px;
+        }
+
+        .contact-info h4 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .contact-info p {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .contact-info a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        /* =============== ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ =============== */
+        .additional-info {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        .additional-info h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .info-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: var(--light-bg);
+            border-radius: 8px;
+        }
+
+        .info-item h4 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        /* Футер */
+        footer {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 0px 0 0px;
+            margin-top: 60px;
+            background-image: url('images/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: multiply;
+            position: relative;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .footer-logo img {
+            width: 0px;
+            height: 0px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .footer-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-btn {
+            padding: 12px 25px;
+            background-color: var(--light-text);
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-btn:hover {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer-btn.contacts {
+            background-color: transparent;
+            color: var(--light-text);
+            border: 2px solid var(--light-text);
+        }
+
+        .footer-btn.contacts:hover {
+            background-color: var(--light-text);
+            color: var(--primary-color);
+        }
+
+        .footer-btn.feedback::before {
+            content: '📧';
+            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+            line-height: 1;
+            margin-top: -0.5px; 
+        }
+
+		.footer-btn.contacts::before {
+			content: '👥';
+			font-size: 15px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			vertical-align: middle;
+			line-height: 1;
+			margin-top: -0.5px; 
+		}
+
+        .footer-divider {
+            height: 1px;
+            background: linear-gradient(
+                to right,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            margin: 20px 0;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 20px;
+        }
+
+		.logo-link {
+			display: inline-block;
+			transition: all 0.3s ease;
+			border-radius: 10px;
+			padding: 5px;
+		}
+
+		.logo-link:hover {
+			transform: scale(1.05);
+			background: rgba(255, 255, 255, 0.1);
+			box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+		}
+
+		.logo-link:active {
+			transform: scale(0.98);
+		}
+
+		/* Убираем подчеркивание ссылки */
+		.logo-link:focus {
+			outline: 2px solid rgba(255, 255, 255, 0.5);
+			outline-offset: 3px;
+		}
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .feedback-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 25px;
+            }
+
+            .footer-buttons {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .footer-btn {
+                min-width: 120px;
+                font-size: 0.9rem;
+                padding: 10px 20px;
+            }
+
+            .footer-logo {
+                justify-content: center;
+            }
+
+            .footer-title {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .footer-btn {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+	<header id="main-header">
+		<div class="container header-content">
+			<a href="soder.html" class="logo-link" title="Перейти к содержанию">
+				<img src="images/logo.png" alt="Газпром нефть" class="img-custom" width="100" height="100" />
+			</a>
+		</div>
+	</header>
+
+    <section class="hero" id="hero-section">
+        <div class="container hero-content">
+            <h1 id="heroTitle">НАУЧНЫЙ НАВИГАТОР</h1>
+            <div class="buttons">
+                <a href="soder.html" class="btn btn-primary">ВЕРНУТЬСЯ К СОДЕРЖАНИЮ</a>
+                <a href="index.html" class="btn btn-primary">ВЕРНУТЬСЯ НА ГЛАВНУЮ СТРАНИЦУ</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="content" class="section">
+        <div class="container">
+            <h2 id="sectionTitle" class="section-title">Обратная связь</h2>
+            <p id="sectionSubtitle" class="section-subtitle">Поделитесь своими предложениями и идеями</p>
+            
+            <div class="feedback-container">
+                <div class="feedback-form-section">
+                    <h3 id="formTitle">Форма обратной связи</h3>
+                    <p id="formDescription">При нажатии "Отправить" откроется Outlook с готовым письмом</p>
+                    
+                    <form id="feedbackForm">
+                        <div id="formFields">
+                        </div>
+                        
+                        <button type="submit" id="submitBtn" class="submit-btn">
+                            Отправить через Outlook
+                        </button>
+                    </form>
+
+                    <div id="infoMessage" class="info-message" style="display: none;">
+                        <h4 id="infoTitle">✅ Готово!</h4>
+                        <p id="infoText">Outlook открыт с готовым письмом.</p>
+                    </div>
+
+                    <div id="errorMessage" class="error-message" style="display: none;">
+                        <h4 id="errorTitle">❌ Ошибка</h4>
+                        <p id="errorText">Не удалось открыть Outlook.</p>
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h3 id="helpTitle">Нужна помощь?</h3>
+                    <p id="helpSubtitle">Альтернативные способы связи</p>
+                    <div id="helpContacts">
+                        <!-- Контакты будут загружены динамически -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="additional-info">
+                <h3 id="additionalTitle">Дополнительная информация</h3>
+                <div id="additionalItems">
+                    <!-- Дополнительная информация будет загружена динамически -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/logo.png" alt="Газпром нефть" />
+                    <h3 class="footer-title">Научный навигатор</h3>
+                </div>
+                
+                <div></div>
+                
+                <div class="footer-buttons">
+                    <a href="svyaz.html" class="footer-btn feedback">
+                        Обратная связь
+                    </a>
+                    
+                    <a href="team.html" class="footer-btn contacts">
+                        Команда
+                    </a>
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 ПАО "Газпром нефть". Команда №6.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="secret-admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Загружаем данные на страницу
+            loadPageContent();
+            generateForm();
+            setupFormHandlers();
+        });
+
+        function loadPageContent() {
+            if (!window.svyazData) {
+                console.error('svyaz-data.js не загружен!');
+                return;
+            }
+            
+            const data = window.svyazData;
+            
+            // Загружаем основной контент
+            document.getElementById('sectionTitle').textContent = data.mainSection.title;
+            document.getElementById('sectionSubtitle').textContent = data.mainSection.subtitle;
+            document.getElementById('formTitle').textContent = data.form.title;
+            document.getElementById('formDescription').textContent = data.form.description;
+            document.getElementById('helpTitle').textContent = data.helpSection.title;
+            document.getElementById('helpSubtitle').textContent = data.helpSection.subtitle;
+            document.getElementById('additionalTitle').textContent = data.additionalInfo.title;
+            
+            // Загружаем сообщения
+            document.getElementById('infoTitle').textContent = data.messages.success.title;
+            document.getElementById('infoText').textContent = data.messages.success.text;
+            document.getElementById('errorTitle').textContent = data.messages.error.title;
+            document.getElementById('errorText').textContent = data.messages.error.text;
+            
+            document.title = data.pageTitle + " - Газпром нефть";
+        }
+
+        function generateForm() {
+            const formFields = document.getElementById('formFields');
+            const helpContacts = document.getElementById('helpContacts');
+            const additionalItems = document.getElementById('additionalItems');
+            
+            if (!window.svyazData || !formFields) return;
+
+            const fields = window.svyazData.form.fields;
+            
+            // Генерируем поля формы
+            formFields.innerHTML = '';
+            
+            Object.keys(fields).forEach(fieldKey => {
+                const field = fields[fieldKey];
+                const fieldDiv = document.createElement('div');
+                fieldDiv.className = 'form-group';
+                
+                let fieldHTML = `<label class="form-label" for="${fieldKey}">
+                    ${field.label}${field.required ? ' *' : ''}
+                </label>`;
+                
+                if (field.type === 'select') {
+                    fieldHTML += `<select class="form-control" id="${fieldKey}" ${field.required ? 'required' : ''}>`;
+                    field.options.forEach(option => {
+                        fieldHTML += `<option value="${option.value}">${option.text}</option>`;
+                    });
+                    fieldHTML += '</select>';
+                } else if (field.type === 'textarea') {
+                    fieldHTML += `<textarea class="form-control" id="${fieldKey}" 
+                        placeholder="${field.placeholder}" 
+                        rows="${field.rows || 4}"
+                        ${field.required ? 'required' : ''}></textarea>`;
+                } else {
+                    fieldHTML += `<input type="${field.type}" class="form-control" id="${fieldKey}" 
+                        placeholder="${field.placeholder}" 
+                        ${field.required ? 'required' : ''}>`;
+                }
+                
+                fieldDiv.innerHTML = fieldHTML;
+                formFields.appendChild(fieldDiv);
+            });
+
+            // Генерируем контакты помощи
+            if (helpContacts) {
+                helpContacts.innerHTML = '';
+                window.svyazData.helpSection.contacts.forEach(contact => {
+                    const contactDiv = document.createElement('div');
+                    contactDiv.className = 'help-contact';
+                    contactDiv.innerHTML = `
+                        <div class="contact-icon">${contact.icon}</div>
+                        <div class="contact-info">
+                            <h4>${contact.title}</h4>
+                            <p>${contact.description}</p>
+                            <a href="${contact.contact.includes('@') ? 'mailto:' : 'tel:'}${contact.contact}">
+                                ${contact.contact}
+                            </a>
+                        </div>
+                    `;
+                    helpContacts.appendChild(contactDiv);
+                });
+            }
+
+            // Генерируем дополнительную информацию
+            if (additionalItems) {
+                additionalItems.innerHTML = '';
+                window.svyazData.additionalInfo.items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'info-item';
+                    itemDiv.innerHTML = `
+                        <h4>${item.title}</h4>
+                        <p>${item.description}</p>
+                    `;
+                    additionalItems.appendChild(itemDiv);
+                });
+            }
+        }
+
+        function setupFormHandlers() {
+            const form = document.getElementById('feedbackForm');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (!form || !submitBtn) return;
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Собираем данные формы
+                const formData = collectFormData();
+                
+                // Валидация
+                if (!validateForm(formData)) {
+                    return;
+                }
+                
+                // Показываем состояние загрузки
+                submitBtn.disabled = true;
+                submitBtn.textContent = window.svyazData.form.submitButton.loadingText;
+                
+                // Открываем Outlook
+                setTimeout(() => {
+                    openOutlookWithData(formData);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = window.svyazData.form.submitButton.text;
+                }, 500);
+            });
+        }
+
+        function collectFormData() {
+            if (!window.svyazData) return {};
+            
+            const formData = {};
+            const fields = window.svyazData.form.fields;
+            
+            Object.keys(fields).forEach(fieldKey => {
+                const element = document.getElementById(fieldKey);
+                if (element) {
+                    formData[fieldKey] = element.value;
+                }
+            });
+            
+            return formData;
+        }
+
+        function validateForm(formData) {
+            if (!window.svyazData) return false;
+            
+            const fields = window.svyazData.form.fields;
+            
+            // Проверяем обязательные поля
+            for (let fieldKey in fields) {
+                const field = fields[fieldKey];
+                if (field.required && !formData[fieldKey]) {
+                    alert(window.svyazData.messages.validation.required);
+                    return false;
+                }
+            }
+            
+            // Проверяем email
+            if (formData.email && !isValidEmail(formData.email)) {
+                alert(window.svyazData.messages.validation.email);
+                return false;
+            }
+
+            // Проверяем минимальную длину сообщения
+            if (formData.message && formData.message.length < 10) {
+                alert(window.svyazData.messages.validation.minLength);
+                return false;
+            }
+            
+            return true;
+        }
+
+        function openOutlookWithData(formData) {
+            if (!window.svyazData) return;
+            
+            const config = window.svyazData.emailConfig;
+            const template = config.bodyTemplate;
+            
+            let body = template.greeting + '\n\n';
+            body += template.intro + '\n\n';
+            
+            // Добавляем данные формы
+            Object.keys(formData).forEach(key => {
+                if (formData[key] && template.fields[key]) {
+                    let value = formData[key];
+                    // Преобразуем тип обращения в читаемый вид
+                    if (key === 'feedbackType' && window.svyazData.categories[value]) {
+                        value = window.svyazData.categories[value];
+                    }
+                    body += `${template.fields[key]}: ${value}\n`;
+                }
+            });
+            
+            body += '\n' + template.footer + ': ' + new Date().toLocaleString('ru-RU');
+            body += '\n\n' + template.signature;
+            
+            const mailtoUrl = `mailto:${config.recipients}?subject=${encodeURIComponent(config.subject)}&body=${encodeURIComponent(body)}`;
+            
+            try {
+                window.location.href = mailtoUrl;
+                showSuccessMessage();
+            } catch (error) {
+                console.error('Ошибка при открытии Outlook:', error);
+                showErrorMessage();
+            }
+        }
+
+        function showSuccessMessage() {
+            document.getElementById('infoMessage').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+            
+            // Прокручиваем к сообщению
+            document.getElementById('infoMessage').scrollIntoView({ behavior: 'smooth' });
+            
+            setTimeout(() => {
+                document.getElementById('feedbackForm').reset();
+                document.getElementById('infoMessage').style.display = 'none';
+            }, 8000);
+        }
+
+        function showErrorMessage() {
+            document.getElementById('errorMessage').style.display = 'block';
+            document.getElementById('infoMessage').style.display = 'none';
+            
+            // Прокручиваем к сообщению об ошибке
+            document.getElementById('errorMessage').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // Функция для обновления скролла
+        window.addEventListener('scroll', function () {
+            const header = document.getElementById('main-header');
+            const scrollPosition = window.scrollY;
+            if (scrollPosition > 270) {
+                if (header) header.classList.add('scrolled');
+            } else {
+                if (header) header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>
